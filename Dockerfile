@@ -1,15 +1,27 @@
-FROM debian:stable-slim
+# Etapa de build
+FROM alpine:3.22 AS builder
 
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     gcc \
+    musl-dev \
     libwebsockets-dev \
-    libssl-dev
+    openssl-dev
 
 WORKDIR /app
 
+COPY ./src ./src
 
-COPY . .
+RUN gcc ./src/_socket.c -o socket -lwebsockets -Os -s
 
-RUN gcc ./src/_socket.c -o socket -lwebsockets
+# Etapa final (imagem mínima)
+FROM alpine:3.22
+
+RUN apk add --no-cache \
+    libwebsockets \
+    openssl
+
+WORKDIR /app
+
+COPY --from=builder /app/socket .
 
 CMD ["./socket"]
