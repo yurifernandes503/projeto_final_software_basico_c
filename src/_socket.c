@@ -1,4 +1,5 @@
 #include <libwebsockets.h>
+#include <stdio.h>
 #include <string.h>
 
 static int callback_ws(
@@ -15,7 +16,12 @@ static int callback_ws(
             break;
 
         case LWS_CALLBACK_RECEIVE:
-            printf("Recebido: %s\n", (char *)in);
+            char receveid_msg[1024];
+
+            memcpy(receveid_msg, in, len);
+            receveid_msg[len] = '\0';
+
+            printf("Recebido a mensagem: %s\n", receveid_msg);
             break;
 
         case LWS_CALLBACK_CLOSED:
