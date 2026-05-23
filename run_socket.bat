@@ -1,3 +1,4 @@
-gcc.exe .\src\_socket.c -o teste.exe -lwebsockets
+docker compose down
+docker compose up -d --build chat
 
-.\teste.exe
+docker compose logs -f chat
