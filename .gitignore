@@ -6,3 +6,6 @@ poc_chat_7777.exe
 poc_chat_5000.exe
 poc_chat_8080.exe
 social_media.db
+
+.idea
+*.exe

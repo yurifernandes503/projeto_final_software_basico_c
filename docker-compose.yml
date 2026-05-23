@@ -1,0 +1,19 @@
+services:
+  chat:
+    build: .
+    container_name: "unimsg_chat"
+    ports:
+      - "9000:9000"
+    tty: true
+    stdin_open: true
+  db:
+    image: mysql:8.0.46
+    container_name: "unimsg-db"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "defaultbehavior"
+      MYSQL_DATABASE: mini_orkut
+      MYSQL_USER: "unimsg"
+      MYSQL_PASSWORD: "unimsgchat2026*"
+    ports:
+      - "3306:3306"
