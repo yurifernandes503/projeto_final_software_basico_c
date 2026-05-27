@@ -115,21 +115,50 @@ Na primeira execução, o banco de dados `social_media.db` é criado automaticam
 
 ### Conversar em rede local
 
-Para trocar mensagens entre dois computadores na mesma rede:
+Ao fazer login, o app já começa a aguardar conexões automaticamente — não é preciso clicar em nada. Para iniciar uma conversa:
 
-**Computador A (quem aguarda conexão):**
+**Computador A (quem aguarda):**
+1. Abra o `poc_chat.exe` e faça login — o status mostrará "Aguardando..."
+2. Na **primeira vez** que o app abre a porta, o Windows exibe um alerta de firewall — clique em **Permitir acesso**. Isso só acontece uma vez por executável.
+
+**Computador B (quem conecta):**
 1. Abra o `poc_chat.exe` e faça login
-2. Clique em **Aguardar**
-3. O Windows pode pedir permissão de firewall — clique em **Permitir**
+2. Adicione o Computador A como contato (nome, IP, porta 7777) no painel direito
+3. Clique no nome do contato na lista — a conexão é iniciada automaticamente
 
-**Computador B (quem inicia a conexão):**
-1. Abra o `poc_chat.exe` e faça login
-2. Digite o IP do Computador A no campo de IP
-3. Clique em **Conectar**
+Após a conexão, as mensagens aparecem com o nome do usuário logado (`"Lara: oi"`).
 
-Após a conexão ser estabelecida, as mensagens enviadas aparecem com o nome do usuário logado.
+---
 
-> **Teste na mesma máquina:** abra duas instâncias do `poc_chat.exe`, use `127.0.0.1` como IP. O loopback não passa pelo firewall, funciona sem permissão de admin.
+### Testar com três instâncias na mesma máquina
+
+Para simular três usuários em um único PC, compile três executáveis com portas diferentes. Cada um escuta em uma porta distinta, então não entram em conflito:
+
+```powershell
+gcc src/main.c src/ui.c src/orquestrador.c src/net.c src/login.c database/db.c database/sqlite3.c `
+  -o poc_chat_7777.exe -I./libs -I./database `
+  -lgdi32 -lshell32 -lmsimg32 -lws2_32 -mwindows -static-libgcc -DNET_PORT=7777
+
+gcc src/main.c src/ui.c src/orquestrador.c src/net.c src/login.c database/db.c database/sqlite3.c `
+  -o poc_chat_5000.exe -I./libs -I./database `
+  -lgdi32 -lshell32 -lmsimg32 -lws2_32 -mwindows -static-libgcc -DNET_PORT=5000
+
+gcc src/main.c src/ui.c src/orquestrador.c src/net.c src/login.c database/db.c database/sqlite3.c `
+  -o poc_chat_8080.exe -I./libs -I./database `
+  -lgdi32 -lshell32 -lmsimg32 -lws2_32 -mwindows -static-libgcc -DNET_PORT=8080
+```
+
+Abra os três ao mesmo tempo. Para conectar o `7777` ao `5000`, adicione `127.0.0.1` com porta `5000` na lista de contatos do `7777` e clique no contato.
+
+> **Firewall no loopback (`127.0.0.1`):** o Windows normalmente não bloqueia conexões locais. Se aparecer o alerta, clique em **Permitir**. Para liberar as portas via PowerShell sem depender do alerta:
+>
+> ```powershell
+> New-NetFirewallRule -DisplayName "Chat 7777" -Direction Inbound -Protocol TCP -LocalPort 7777 -Action Allow
+> New-NetFirewallRule -DisplayName "Chat 5000" -Direction Inbound -Protocol TCP -LocalPort 5000 -Action Allow
+> New-NetFirewallRule -DisplayName "Chat 8080" -Direction Inbound -Protocol TCP -LocalPort 8080 -Action Allow
+> ```
+>
+> Execute como Administrador. Depois disso o alerta não aparece mais.
 
 ---
 
@@ -159,12 +188,16 @@ Após a conexão ser estabelecida, as mensagens enviadas aparecem com o nome do 
 - [x] Interface gráfica nativa Win32 com Nuklear
 - [x] Arquitetura multiprocesso — UI, backend e rede em processos separados
 - [x] IPC não-bloqueante via `CreatePipe` + `PeekNamedPipe`
-- [x] Chat em tempo real via TCP (Winsock2)
+- [x] Chat em tempo real via TCP (Winsock2) — LAN e loopback
 - [x] Tela de login e cadastro de usuário
-- [x] Banco de dados local com SQLite
+- [x] Banco de dados local com SQLite (login, contatos, histórico de mensagens)
 - [x] Mensagens identificadas pelo nome do usuário logado
+- [x] Lista de contatos persistida por usuário com histórico de conversa
+- [x] Auto-listen ao fazer login, auto-relisten após desconexão
+- [x] Notificação de mensagem nova (`*`) no nome do contato
+- [x] Detecção de "linha ocupada" com aviso quando alguém tenta conectar durante conversa
 
 ## Em desenvolvimento
 
-- [ ] Lista de amigos e solicitações de amizade
+- [ ] Solicitações de amizade (aceitar/recusar)
 - [ ] Feed de posts

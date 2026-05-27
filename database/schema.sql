@@ -1,5 +1,4 @@
--- Schema MVP — só o necessário para login e cadastro funcionar.
--- Tabelas das fases futuras (amizades, posts, etc.) serão adicionadas quando chegar a hora.
+-- Schema MVP — login, cadastro, contatos e histórico de mensagens.
 --
 -- Adaptado para SQLite:
 --   AUTO_INCREMENT → INTEGER PRIMARY KEY
@@ -18,10 +17,29 @@ CREATE TABLE IF NOT EXISTS cadastros (
 );
 
 -- apelido é o nome exibido no chat.
--- Por enquanto é igual ao login, mas fica separado para crescer depois.
 CREATE TABLE IF NOT EXISTS perfis (
     id_perfil   INTEGER PRIMARY KEY,
     id_cadastro INTEGER NOT NULL UNIQUE,
     apelido     TEXT NOT NULL,
     FOREIGN KEY (id_cadastro) REFERENCES cadastros(id_cadastro) ON DELETE CASCADE
+);
+
+-- contatos locais por usuário — cada perfil tem sua própria lista.
+-- porta permite distinguir instâncias diferentes na mesma máquina.
+CREATE TABLE IF NOT EXISTS contatos (
+    id_contato INTEGER PRIMARY KEY,
+    id_perfil  INTEGER NOT NULL,
+    apelido    TEXT NOT NULL,
+    ip_ultimo  TEXT NOT NULL,
+    porta      INTEGER NOT NULL DEFAULT 7777,
+    FOREIGN KEY (id_perfil) REFERENCES perfis(id_perfil) ON DELETE CASCADE
+);
+
+-- histórico de mensagens por contato, em ordem de envio.
+CREATE TABLE IF NOT EXISTS mensagens (
+    id_mensagem INTEGER PRIMARY KEY,
+    id_contato  INTEGER NOT NULL,
+    remetente   TEXT NOT NULL,
+    texto       TEXT NOT NULL,
+    FOREIGN KEY (id_contato) REFERENCES contatos(id_contato) ON DELETE CASCADE
 );

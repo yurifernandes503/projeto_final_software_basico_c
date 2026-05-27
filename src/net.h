@@ -21,6 +21,7 @@ struct nk_context;
 #define EVT_CONNECTED    "CONNECTED:"    /* conexão ok:  CONNECTED:192.168.0.5 */
 #define EVT_MSG          "MSG:"          /* mensagem recebida: MSG:texto aqui  */
 #define EVT_DISCONNECTED "DISCONNECTED"  /* peer encerrou a conexão */
+#define EVT_BUSY         "BUSY:"         /* alguém tentou conectar mas estamos ocupados: BUSY:ip */
 #define EVT_ERROR        "ERROR:"        /* falha: ERROR:descrição */
 
 /*
