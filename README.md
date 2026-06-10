@@ -201,3 +201,14 @@ Abra os três ao mesmo tempo. Para conectar o `7777` ao `5000`, adicione `127.0.
 
 - [ ] Solicitações de amizade (aceitar/recusar)
 - [ ] Feed de posts
+
+
+⚠️ Este repositório é um fork do projeto original desenvolvido em equipe.
+
+## Minha contribuição
+
+- Modelagem do banco de dados MySQL
+- Criação das entidades
+- Desenvolvimento dos scripts SQL
+- Relacionamentos entre tabelas
+- Estruturação da persistência de dados
